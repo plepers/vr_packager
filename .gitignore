@@ -11,3 +11,12 @@
 *.lai
 *.la
 *.a
+
+
+# VS stuff
+*.sdf
+tests
+Debug
+Release
+ipch
+vr_packager/Debug
