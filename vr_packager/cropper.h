@@ -26,7 +26,7 @@ struct AreaChunk
 };
 
 
-CropArea* processFace( unsigned char* face, int faceIndex, size_t width, size_t height, unsigned int& numAreas, int threshold ) ;
+CropArea* processFace( unsigned char* face, int faceIndex, size_t width, size_t height, unsigned int& numAreas, int threshold, int athreshold ) ;
 
 void toChunks( CropArea* areas, AreaChunk* chunks, unsigned int len, size_t width, size_t height ) ;
 

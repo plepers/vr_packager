@@ -22,7 +22,7 @@ void toChunks( CropArea* areas, AreaChunk* chunks, unsigned int len, size_t widt
 }
 
 bool
-refineV( unsigned char* face, int faceIndex,CropArea* areas, size_t width, size_t height, unsigned int& numAreas, int threshold ){
+refineV( unsigned char* face, int faceIndex,CropArea* areas, size_t width, size_t height, unsigned int& numAreas, int threshold, int athreshold ){
 	//printf( "inlen : %i \n", numAreas );
 	int nareas = numAreas;
 	int newlen = nareas;
@@ -73,7 +73,7 @@ refineV( unsigned char* face, int faceIndex,CropArea* areas, size_t width, size_
 			blank = true;
 
 			while( cy < bottom ) {
-				if( face[column*XM + cy*YM + 3] != 0 ) {
+				if( face[column*XM + cy*YM + 3] > athreshold ) {
 					blank = false;
 					if(lminx==-1) lminx = cy;
 					lmaxx = cy;
@@ -146,7 +146,7 @@ refineV( unsigned char* face, int faceIndex,CropArea* areas, size_t width, size_
 	return (newlen != numAreas);
 }
 
-CropArea* processFace( unsigned char* face, int faceIndex, size_t width, size_t height, unsigned int& numAreas, int threshold ) {
+CropArea* processFace( unsigned char* face, int faceIndex, size_t width, size_t height, unsigned int& numAreas, int threshold, int athreshold ) {
 
 	CropArea* areas = (CropArea*) malloc( height*sizeof(CropArea) );
 	
@@ -179,7 +179,7 @@ CropArea* processFace( unsigned char* face, int faceIndex, size_t width, size_t 
 		lmaxx = -1;
 
 		while( currentPx < width ) {
-			if( face[loffset+currentPx*4+3] != 0 ) {
+			if( face[loffset+currentPx*4+3] > athreshold ) {
 				blank = false;
 				if(lminx==-1) lminx = currentPx;
 				lmaxx = currentPx;
@@ -214,7 +214,7 @@ CropArea* processFace( unsigned char* face, int faceIndex, size_t width, size_t 
 	}
 	if( _in > -1 ) {
 		w = maxx-minx+1;
-		h = currentline - 1-_in;
+		h = currentline-_in;
 		if( w*h > threshold ) {
 			areas[currentBound].face = faceIndex;
 			areas[currentBound].y = _in;
@@ -230,7 +230,7 @@ CropArea* processFace( unsigned char* face, int faceIndex, size_t width, size_t 
 	else
 		numAreas = currentBound;
 
-	refineV( face, faceIndex, areas, width, height, numAreas, threshold );
+	refineV( face, faceIndex, areas, width, height, numAreas, threshold, athreshold );
 
 	for( int i = 0; i< numAreas; i++ ){
 		areas[i].index = i;

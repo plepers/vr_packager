@@ -59,6 +59,7 @@ int main(int argc, char* argv[])
 	ValueArg<string> a_input("i","input","input raw cube texture",true,"","string", cmd );
 	ValueArg<string> a_output("o","output","output raw file",true,"","string", cmd );
 	ValueArg<int> a_threshold("t","threshold","minimum crops area",false, 1,"int", cmd );
+	ValueArg<int> a_at("a","alpha","alpha limit",false, 10,"int", cmd );
 	
 	
 
@@ -68,6 +69,7 @@ int main(int argc, char* argv[])
 	const char* output = a_output.getValue().c_str();
 	
 	int threshold = a_threshold.getValue();
+	int athreshold = a_at.getValue();
 
 	
 	
@@ -124,7 +126,7 @@ int main(int argc, char* argv[])
 	AreaChunk* chunks;
 
 	for( i = 0; i< 6; i++ ) {
-		CropArea* areas = processFace( faces[i], i, faceSize, faceSize, numAreas, threshold);
+		CropArea* areas = processFace( faces[i], i, faceSize, faceSize, numAreas, threshold, athreshold);
 
 		
 		chunks = (AreaChunk*) malloc( numAreas * sizeof( AreaChunk ) );
