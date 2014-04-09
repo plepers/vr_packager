@@ -1,7 +1,15 @@
 
 
 #include "cropper.h"
+
+#ifdef WIN
 #include <Windows.h>
+#endif
+
+#ifdef OSX
+#include <stdlib.h>
+#endif
+
 #include <stdio.h>
 
 

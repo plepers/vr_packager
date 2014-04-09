@@ -45,7 +45,9 @@ bool IsPowerOfTwo(unsigned int x)
 double getNewBase( char min, char max ) {
 	double newbaseMax = pow( pow( 2.0, max ), 1.0/128.0 );
 	double newbaseMin = pow( pow( 2.0, min ), -1.0/128.0 );
-	return max( newbaseMax, newbaseMin );
+    if( newbaseMax > newbaseMin )
+        return newbaseMax;
+    return newbaseMin;
 }
 
 
@@ -81,7 +83,7 @@ int main(int argc, char* argv[])
 	//==================================================
 
 	unsigned char* png;
-	size_t width, height;
+	unsigned width, height;
 
 	unsigned error = lodepng_decode32_file(&png, &width, &height, input);
 

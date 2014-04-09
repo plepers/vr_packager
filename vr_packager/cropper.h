@@ -2,6 +2,8 @@
 
 #define CROPPER_H
 
+#include <stdio.h>
+
 typedef struct CropArea CropArea;
 typedef struct AreaChunk AreaChunk;
 
