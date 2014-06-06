@@ -154,16 +154,18 @@ refineV( unsigned char* face, int faceIndex,CropArea* areas, size_t width, size_
 	return (newlen != numAreas);
 }
 
-CropArea* processFace( unsigned char* face, int faceIndex, size_t width, size_t height, unsigned int& numAreas, int threshold, int athreshold ) {
+void* processFace( void* input ) {
+    
+    BOUNDS_PARAM* params = ( BOUNDS_PARAM* ) input;
 
-	CropArea* areas = (CropArea*) malloc( height*sizeof(CropArea) );
+	CropArea* areas = (CropArea*) malloc( params->height*sizeof(CropArea) );
 	
-	unsigned char* ptr = face;
+	unsigned char* ptr = params->face;
 	
 	int currentBound = 0;
 	int currentline = 0;
 	int currentPx = 0;
-	int minx = width;
+	int minx = params->width;
 	int maxx = 0;
 	int lminx = 0;
 	int lmaxx = 0;
@@ -176,18 +178,18 @@ CropArea* processFace( unsigned char* face, int faceIndex, size_t width, size_t 
 
 	int _in = -1;
 
-	while( currentline < height ) {
+	while( currentline < params->height ) {
 
 		currentPx = 0;
 		blank = true;
 
-		loffset = currentline*width*4;
+		loffset = currentline*params->width*4;
 
 		lminx = -1;
 		lmaxx = -1;
 
-		while( currentPx < width ) {
-			if( face[loffset+currentPx*4+3] > athreshold ) {
+		while( currentPx < params->width ) {
+			if( params->face[loffset+currentPx*4+3] > params->athreshold ) {
 				blank = false;
 				if(lminx==-1) lminx = currentPx;
 				lmaxx = currentPx;
@@ -204,8 +206,8 @@ CropArea* processFace( unsigned char* face, int faceIndex, size_t width, size_t 
 		} else if( blank && _in > -1) {
 			w = maxx-minx+1;
 			h = currentline-_in;
-			if( w*h > threshold ) {
-				areas[currentBound].face = faceIndex;
+			if( w*h > params->threshold ) {
+				areas[currentBound].face = params->faceIndex;
 				areas[currentBound].y = _in;
 				areas[currentBound].x = minx;
 				areas[currentBound].width = w;
@@ -214,7 +216,7 @@ CropArea* processFace( unsigned char* face, int faceIndex, size_t width, size_t 
 			}
 			_in = -1;
 
-			minx = width;
+			minx = params->width;
 			maxx = 0;
 		}
 
@@ -223,8 +225,8 @@ CropArea* processFace( unsigned char* face, int faceIndex, size_t width, size_t 
 	if( _in > -1 ) {
 		w = maxx-minx+1;
 		h = currentline-_in;
-		if( w*h > threshold ) {
-			areas[currentBound].face = faceIndex;
+		if( w*h > params->threshold ) {
+			areas[currentBound].face = params->faceIndex;
 			areas[currentBound].y = _in;
 			areas[currentBound].x = minx;
 			areas[currentBound].width =w;
@@ -234,15 +236,18 @@ CropArea* processFace( unsigned char* face, int faceIndex, size_t width, size_t 
 		}
 	}
 	if(currentBound==0)
-		numAreas = 0;
+		params->numAreas = 0;
 	else
-		numAreas = currentBound;
+		params->numAreas = currentBound;
 
-	refineV( face, faceIndex, areas, width, height, numAreas, threshold, athreshold );
+	refineV( params->face, params->faceIndex, areas, params->width, params->height, params->numAreas, params->threshold, params->athreshold );
 
-	for( int i = 0; i< numAreas; i++ ){
+	for( int i = 0; i< params->numAreas; i++ ){
 		areas[i].index = i;
 	}
-
-	return areas;
+	
+    params->areasResult = areas;
+    
+    return NULL;
 }
+

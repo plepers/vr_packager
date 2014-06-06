@@ -15,6 +15,9 @@ float** subscaleFaces(float** faces, int w, int h, int level );
 
 unsigned char* crop( unsigned char* face, CropArea* area, int facesize );
 
+
+
+
 int numMipForSize( int inSize ) {
 	
 	int mip = 1;
@@ -51,9 +54,29 @@ double getNewBase( char min, char max ) {
 }
 
 
+#ifdef OSX
+
+void WaitForThreads( int NUM_THREADS, pthread_t* threads ){
+    
+    int rc, i;
+    
+    for (i=0; i<NUM_THREADS; ++i) {
+        // block until thread i completes
+        rc = pthread_join(threads[i], NULL);
+        assert(0 == rc);
+    }
+    
+}
+#endif
+
+
+
+
 int main(int argc, char* argv[])
 {
-
+    
+	printf( "bla bla bla" );
+    
 	int faceSize;
 
 	CmdLine cmd("diffusefilter - generate blured cube map", ' ', "0.1");
@@ -126,9 +149,46 @@ int main(int argc, char* argv[])
 	char nameBuf[255];
 
 	AreaChunk* chunks;
-
+    
+#ifdef OSX
+    pthread_t threads[6];
+    int rc;
+#endif
+    
+	
+    BOUNDS_PARAM* params = (BOUNDS_PARAM*) malloc(6*sizeof(BOUNDS_PARAM) );
+    
 	for( i = 0; i< 6; i++ ) {
-		CropArea* areas = processFace( faces[i], i, faceSize, faceSize, numAreas, threshold, athreshold);
+        printf( "process loop %i ", i );
+        params[i].face = faces[i];
+        params[i].faceIndex = i;
+        params[i].width = faceSize;
+        params[i].height = faceSize;
+        params[i].threshold = threshold;
+        params[i].athreshold = athreshold;
+
+#ifdef WIN
+		processFace( &params[i] );
+#endif
+        
+#ifdef OSX
+        rc = pthread_create( &threads[i], NULL, processFace, (void *) &params[i]);
+        assert(0 == rc);
+#endif
+        
+    }
+    
+#ifdef OSX
+    WaitForThreads( 6, threads );
+#endif
+    
+    for( i = 0; i< 6; i++ ) {
+    	
+        printf( "write loop %i ", i );
+        
+        numAreas = params[i].numAreas;
+        
+        CropArea* areas = params[i].areasResult;
 
 		
 		chunks = (AreaChunk*) malloc( numAreas * sizeof( AreaChunk ) );

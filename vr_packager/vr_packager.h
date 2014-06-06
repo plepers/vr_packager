@@ -11,9 +11,13 @@
 #endif
 
 #ifdef OSX
+#include <pthread.h>
 #include <stdlib.h>
 #include <math.h>
+#include <assert.h>
 #endif
+
+
 
 
 #include <string>

@@ -27,8 +27,23 @@ struct AreaChunk
 	float height;
 };
 
+typedef struct core_bounds_params {
+	
+    unsigned char* face;
+    int faceIndex;
+    size_t width;
+    size_t height;
+    unsigned int numAreas;
+    int threshold;
+    int athreshold;
+    
+    CropArea* areasResult;
+    
+} BOUNDS_PARAM;
 
-CropArea* processFace( unsigned char* face, int faceIndex, size_t width, size_t height, unsigned int& numAreas, int threshold, int athreshold ) ;
+
+
+void* processFace( void* input ) ;
 
 void toChunks( CropArea* areas, AreaChunk* chunks, unsigned int len, size_t width, size_t height ) ;
 
